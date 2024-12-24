@@ -55,4 +55,14 @@ class EditTicket extends EditRecord
 
         return $record;
     }
+
+    protected function authorizeAccess(): void
+    {
+        $user = User::find(auth()->id());
+        if($user->checkPermissionTo('Traiter ticket'))
+        {
+            abort_unless($this->getRecord()->technicien_id == $user->id, 403);
+        }
+        abort_unless(static::getResource()::canView($this->getRecord()), 403);
+    }
 }

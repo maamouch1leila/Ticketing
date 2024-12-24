@@ -96,7 +96,7 @@ class TicketResource extends Resource
 
                     ->visible(function () {
                         $auth = User::find(auth()->user()->id);
-                        if ($auth->checkPermissionTo('traiter ticket')) return true;
+                        if ($auth->checkPermissionTo('Traiter ticket')) return true;
                         return false;
                     })
 
@@ -117,7 +117,7 @@ class TicketResource extends Resource
 
                     ->visible(function () {
                         $auth = User::find(auth()->user()->id);
-                        if ($auth->checkPermissionTo('traiter ticket')) return true;
+                        if ($auth->checkPermissionTo('Traiter ticket')) return true;
                         return false;
                     })
 
@@ -172,12 +172,12 @@ class TicketResource extends Resource
             ->modifyQueryUsing(function (Builder $query) {
                 $auth = auth()->user();
                 $user = User::find($auth->id);
-                if ($user->hasRole('technicien')) {
-                    return $query->where('technicien_id', $auth->id)->orderBy('created_at', 'DESC');
-                } else if ($user->hasRole('Employee')) {
-                    return $query->where('user_id', $auth->id)->orderBy('created_at', 'DESC');
-                } else if ($user->isSuperAdmin()) {
+                if ($user->checkPermissionTo('Traiter ticket')) {
+                    return $query->where('technicien_id', $user->id)->orderBy('created_at', 'DESC');
+                }else if ($user->isSuperAdmin()) {
                     return $query->orderBy('created_at', 'DESC');
+                }else{
+                    return $query->where('user_id',$user->id)->orderBy('created_at', 'DESC');
                 }
             })
             ->columns([
